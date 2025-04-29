@@ -1,4 +1,4 @@
-# Plaing Tetris Using Reinforcement Learning 
+# Playing Tetris Using Reinforcement Learning 
 **Application of Reinforcement Learning Algorithms to a Simplified Tetris Environment**
 
 **1. Introduction**
