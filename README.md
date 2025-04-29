@@ -6,20 +6,16 @@ In this project, I have implemented and compared three RL algorithms—Deep Q‑
 
 
 **2. Dataset(s) Source and Description**
-- The Tetris state is represented by a 10×20 grid of binary values at each time step. I am not using any Data to train the model as the agent interacts with the environment and learns from that. 
+- The Tetris state space is represented by a 10×20 grid. I am not using any Data to train the model as the agent interacts with the environment and learns from that. 
 
 **3. Data Exploration and Important Features**
-This project does not utilize a traditional external dataset. Instead, it relies on a simulated Tetris environment created programmatically using Python and Pygame. The environment consists of:
-* I am using a three-dimensional feature vector per time-step:
-  1. Column Height: Maximum occupied row (normalized).
-  2. Number of Holes: Empty cells below blocks (normalized).
-  3. Bumpiness: Sum of adjacent column height differences (normalized).
+This project does not use a external dataset. Instead, it relies on a simulated Tetris environment created programmatically using Python and Pygame. The environment consists of:
 * Grid Size: A 10x20 grid (10 columns wide, 20 rows tall), where each cell is either empty (0) or occupied (1).
 * Tetriminos: Five simplified piece types (I, O, T, L, J), each represented as a 2D NumPy array defining their shape.
-* Game Mechanics: The agent can perform four actions—move left, move right, rotate, and drop—while pieces fall incrementally. Lines are cleared when a row is fully occupied, increasing the score, and the game ends when a new piece cannot spawn without overlapping existing blocks.
-* Action Space: {0,1,2,3} (Left, Right, Rotate, Drop)
-  
-The environment generates experiences dynamically as the agent interacts with it, producing states, actions, rewards. 
+* Action Space: The agent can perform four actions—move left, move right, rotate, and drop—while pieces fall incrementally.
+*  Game Mechanics: Lines are cleared when a row is fully occupied, increasing the score, and the game ends when a new piece cannot spawn without overlapping existing blocks.
+
+  The environment generates experiences dynamically as the agent interacts with it, producing states, actions, rewards. 
 
 **4. Data Exploration and Important Features**
 
@@ -28,9 +24,7 @@ Since there is no static dataset, "data exploration" pertains to analyzing the s
 * Holes: The total number of empty cells below occupied cells in each column, normalized by 50 (an estimated maximum). Holes complicate future piece placements and reduce line-clearing opportunities.
 * Bumpiness: The sum of absolute height differences between adjacent columns, normalized by 100 (an estimated maximum). High bumpiness reflects an uneven grid surface, making it harder to fit pieces efficiently.
 
-These features were chosen because they capture critical aspects of Tetris gameplay, aligning with heuristic strategies used in traditional Tetris AI designs. They provide a compact yet informative representation for the agent to evaluate its actions.
-
-
+These features were chosen because they capture critical aspects of Tetris gameplay. They provide a compact yet informative representation for the agent to evaluate its actions.
 
 **5. Methods**
 * Tetris Environment
@@ -43,66 +37,60 @@ These features were chosen because they capture critical aspects of Tetris gamep
 5.1 **Deep Q‑Network (DQN)**
 - Neural network: two hidden layers (24 units, ReLU), output Q‑values for 4 actions.
 - ε‑greedy exploration, replay buffer (2k capacity), batch size 32.
-- Learning Rate: 0.1, γ=0.95.
+- Learning Rate: 0.1, discount factor (γ) = 0.95.
 
 5.2 **REINFORCE (Monte Carlo Policy Gradient)**
 - Policy network: with softmax output and same hidden layers 
 - Full-episode Monte Carlo returns, no baseline.
-- Learning Rate: 0.1, γ=0.99.
+- Learning Rate: 0.1, discount factor (γ) = 0.99.
 
 5.3 **Proximal Policy Optimization (PPO)**
 - Policy & value networks: same hidden layers.
-- - Clip ratio ε=0.2, policy LR=1e-4, value LR=1e-3.
+- - Clip ratio ε=0.2, Learning rate- 0.001
 - - 10 epochs per update, batch = 10 episodes.
 
 5.3 **PPO with Baseline (PPO‑BL)**
 - Policy & value networks: same hidden layers.
 - GAE(λ=0.95) for advantage estimation.
-- Clip ratio ε=0.2, policy LR=1e-4, value LR=1e-3.
+- Clip ratio ε=0.2,0.4, learning rate 0.001
 - 10 epochs per update, batch = 10 episodes.
 
 
 **6. Experimentation**
 6.1 **Training Protocol**
-- Train each agent for 2000 episodes.
-- Track per-episode reward, moving average over 100 episodes.
-
-6.2 **Hyperparameter Search**
-- DQN: vary learning rate {0.01, 0.05, 0.1}, ε_decay {0.99, 0.995}.
-- REINFORCE: vary learning rate {0.01, 0.1}.
-- PPO‑BL: vary clip ratio {0.1, 0.2, 0.3}, λ {0.9, 0.95}.
+- Train each agent for 1000 - 2000 episodes.
+- Track per-episode reward
 
 **7. Observations & Analysis**
 7.1 **Convergence Speed**
-- DQN reached an average 500 reward in ~800 episodes.
-- REINFORCE slowly improved, plateaued around 300 reward by 2000 episodes.
-- PPO‑BL attained 600 reward by 600 episodes, stable thereafter.
+- DQN started improving in ~1950 episodes.
+- REINFORCE - I tried with near 10,000 episodes and till 5300 there was no improvement.
+- PPO started improving after 2000 episodes
+- PPO‑BL surprisingly improved in 1000 episodes. 
 
 7.2 **Stability**
-- DQN showed high variance early (ε decay), but stabilized.
-- REINFORCE exhibited large fluctuations—sensitive to return variance.
-- PPO‑BL had the smoothest learning curve, thanks to clipping and baseline normalization.
+- DQN showed slow variace after improvement (ε decay), hence stabilized.
+- REINFORCE - No idea.
+- PPO- Showed low variace hence stabilized due to clipping. 
+- PPO‑BL Showed improvement in early 1000 episodes but the varaince is low hence not much stabilized initially, we can run the algorithm for more than 2000 episodes to see exactly. 
 
-7.3 **Final Performance**
-- PPO‑BL: mean final reward ≈ 750 ± 30.
-- DQN: mean final reward ≈ 650 ± 50.
-- REINFORCE: mean final reward ≈ 400 ± 75.
-
-7.4 **Computational Cost**
+7.3 **Computational Cost**
 - DQN: moderate compute (experience replay overhead).
-- REINFORCE: light compute per update, but slow convergence.
-- PPO‑BL: higher compute per update (multiple epochs), but sample efficient.
+- REINFORCE: Very Slow convergence.
+- PPO: Moderate Convergence but slower than DQN (wrt time)
+- PPO‑BL: higher compute per update , but sample efficient.
 
 **8. Conclusion**
-PPO‑BL outperforms DQN and REINFORCE in this Tetris task, offering fast convergence and stable learning. DQN remains a strong baseline but is outstripped by on‑policy methods with advantage estimation. REINFORCE, while conceptually simple, suffers from variance and slow learning.
+* PPO with Value Baseline (PPO-BL) showed the best learning performance among all the algorithms tested. Its ability to clip policy updates helped improve stability, although using a very high clipping range reduced the improvement rate.
+* Both DQN and PPO (without baseline) performed well in terms of learning speed and stability. Their convergence rates were quite similar, especially after running for around 3000 episodes.
+* REINFORCE, though easy to understand and implement, had the slowest learning progress. This might be due to its high variance or possibly due to issues in the code implementation, which I couldn’t resolved.
 
 **9. References**
-- Schulman, J. et al. (2015). High‐Dimensional Continuous Control Using Generalized Advantage Estimation.
-- Mnih, V. et al. (2015). Human‐Level Control through Deep Reinforcement Learning.
-- Schulman, J. et al. (2017). Proximal Policy Optimization Algorithms.
+- https://github.com/nuno-faria/tetris-ai/blob/master/README.md
+- Proximal Policy Optimization Algorithms - https://web.stanford.edu/class/cs234/
+- https://www.cs.toronto.edu/~cmaddis/courses/sta4273_w21/studentwork/gae.pdf
 
-**Appendices**
-- Code snippets for environment, agents, and training loops.
-- Learning curves and reward plots.
-- Sample replay buffer profiling logs.
+**Acknowledgement**
+* A significant portion of the code for this project was developed with the assistance of large language models (LLMs), which provided guidance on implementation details and debugging.
+* The implementation idea for the DQN agent was inspired by the open-source project available at nuno-faria/tetris-ai, which served as a foundational reference.
 
