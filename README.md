@@ -4,7 +4,6 @@
 **1. Introduction**
 In this project, I have implemented and compared three RL algorithms—Deep Q‑Network (DQN), REINFORCE (Monte Carlo Policy Gradient), and Proximal Policy Optimization (PPO), and PPO with Baseline (PPO‑BL)—on a simplified Tetris environment. The aim is to evaluate the improvement speed, stability, and final performance of each method. The objective is to train an agent that learns optimal strategies to maximize its score by interacting with a simulated Tetris environment. The project uses a custom Tetris environment built with Pygame Library. 
 
-
 **2. Dataset(s) Source and Description**
 - The Tetris state space is represented by a 10×20 grid. I am not using any Data to train the model as the agent interacts with the environment and learns from that. 
 
@@ -34,27 +33,28 @@ These features were chosen because they capture critical aspects of Tetris gamep
 3. Reward: +1 per line cleared, 0 for game over. (This is different for PPO with BL with +1 per line crossed and -100 for game over)
 4. Termination: The episode ends when a new piece cannot spawn (game over).
    
-5.1 **Deep Q‑Network (DQN)**
-- Neural network: two hidden layers (24 units, ReLU), output Q‑values for 4 actions.
-- ε‑greedy exploration, replay buffer (2k capacity), batch size 32.
-- Learning Rate: 0.1, discount factor (γ) = 0.95.
+**5.1 Deep Q-Network (DQN)**
+* Overview: A value-based method that estimates Q-values (expected rewards) for state-action pairs.
+* Neural Network: Two hidden layers (24 units, ReLU), outputting Q-values for 4 actions.
+* Exploration: ε-greedy with decay (1.0 to 0.01).
+* Replay Buffer: 2000 capacity, batch size 32.
+* Hyperparameters: Learning rate = 0.1, discount factor (γ) = 0.95.
 
-5.2 **REINFORCE (Monte Carlo Policy Gradient)**
-- Policy network: with softmax output and same hidden layers 
-- Full-episode Monte Carlo returns, no baseline.
-- Learning Rate: 0.1, discount factor (γ) = 0.99.
+**5.2 REINFORCE (Monte Carlo Policy Gradient)**
+* Overview: A policy-based method that optimizes the policy directly using episode returns.
+* Neural Network: Policy network with two hidden layers (24 units, ReLU), softmax output.
+* Training: Full-episode Monte Carlo returns, no baseline.
+* Hyperparameters: Learning rate = 0.1, discount factor (γ) = 0.99.
 
-5.3 **Proximal Policy Optimization (PPO)**
-- Policy & value networks: same hidden layers.
-- - Clip ratio ε=0.2, Learning rate- 0.001
-- - 10 epochs per update, batch = 10 episodes.
+**5.3 Proximal Policy Optimization (PPO)**
+* Overview: A policy-based method with a clipped objective for stable updates, paired with a value function.
+* Neural Networks: Policy and value networks, each with two hidden layers (24 units, ReLU).
+* Hyperparameters: Clip ratio ε = 0.2, learning rate = 0.001, 10 epochs per update, batch = 10 episodes.
 
-5.4 **PPO with Baseline (PPO‑BL)**
-- Policy & value networks: same hidden layers.
-- GAE(λ=0.95) for advantage estimation.
-- Clip ratio ε=0.2,0.4, learning rate 0.001
-- 10 epochs per update, batch = 10 episodes.
-
+**5.4 PPO with Baseline (PPO-BL)**
+* Overview: Extends PPO with Generalized Advantage Estimation (GAE) for improved advantage calculation.
+* Neural Networks: Same as PPO.
+* Hyperparameters: GAE (λ = 0.95), clip ratio ε = 0.2 or 0.4, learning rate = 0.001, 10 epochs per update, batch = 10 episodes.
 
 **6. Experimentation**
 - Trained each agent for 1000 - 3000 episodes.
@@ -62,22 +62,22 @@ These features were chosen because they capture critical aspects of Tetris gamep
 
 **7. Observations & Analysis**
 7.1 **Convergence Speed**
-- DQN started improving in ~1950 episodes.
-- REINFORCE - I tried with near 10,000 episodes and till 5300 there was no improvement.
-- PPO started improving after 2000 episodes
-- PPO‑BL surprisingly improved in just 1000 episodes. 
+- DQN - Improvement began around 1950 episodes.
+- REINFORCE - No significant progress by 5300 episodes, even up to 10,000.
+- PPO -  Improvement started after ~2000 episodes.
+- PPO‑BL - surprisingly improved in just 1000 episodes. 
 
 7.2 **Stability**
-- DQN showed slow variace after improvement (ε decay), hence stabilized.
-- REINFORCE - No idea.
-- PPO- Showed low variace hence stabilized due to clipping. 
-- PPO‑BL Showed improvement in early 1000 episodes but the varaince is low hence not much stabilized initially, we can run the algorithm for more than 2000 episodes to see exactly. 
-
+- DQN - Low variance post-improvement due to ε-decay, indicating stability.
+- REINFORCE - Stability unclear due to slow progress; more episodes or implementation review is needed.
+- PPO- Low variance and quick stabilization from clipping.
+- PPO‑BL- Early improvement with higher initial variance; running 2000+ episodes could confirm long-term stability.
+  
 7.3 **Computational Cost**
-- DQN: moderate compute (experience replay overhead).
-- REINFORCE: Very Slow convergence.
-- PPO: Moderate Convergence but slower than DQN (wrt time)
-- PPO‑BL: higher compute per update , but sample efficient.
+- DQN -  Moderate, with replay buffer overhead. 
+- REINFORCE - High cost due to slow convergence.
+- PPO -  Moderate speed, slower than DQN in time but more stable.
+- PPO‑BL - higher compute per update , but sample efficient.
 
 **8. Conclusion**
 * PPO with Value Baseline (PPO-BL) showed the best learning performance among all the algorithms tested. Its ability to clip policy updates helped improve stability, although using a very high clipping range reduced the improvement rate.
