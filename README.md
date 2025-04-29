@@ -49,7 +49,7 @@ These features were chosen because they capture critical aspects of Tetris gamep
 - - Clip ratio ε=0.2, Learning rate- 0.001
 - - 10 epochs per update, batch = 10 episodes.
 
-5.3 **PPO with Baseline (PPO‑BL)**
+5.4 **PPO with Baseline (PPO‑BL)**
 - Policy & value networks: same hidden layers.
 - GAE(λ=0.95) for advantage estimation.
 - Clip ratio ε=0.2,0.4, learning rate 0.001
@@ -57,8 +57,7 @@ These features were chosen because they capture critical aspects of Tetris gamep
 
 
 **6. Experimentation**
-6.1 **Training Protocol**
-- Train each agent for 1000 - 2000 episodes.
+- Trained each agent for 1000 - 3000 episodes.
 - Track per-episode reward
 
 **7. Observations & Analysis**
@@ -66,7 +65,7 @@ These features were chosen because they capture critical aspects of Tetris gamep
 - DQN started improving in ~1950 episodes.
 - REINFORCE - I tried with near 10,000 episodes and till 5300 there was no improvement.
 - PPO started improving after 2000 episodes
-- PPO‑BL surprisingly improved in 1000 episodes. 
+- PPO‑BL surprisingly improved in just 1000 episodes. 
 
 7.2 **Stability**
 - DQN showed slow variace after improvement (ε decay), hence stabilized.
